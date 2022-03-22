@@ -2,6 +2,9 @@ package com.taller1.repositories;
 
 import org.springframework.data.repository.CrudRepository;
 
-public interface LocationRepository extends CrudRepository<LocationRepository, Integer> {
+import com.taller1.model.prod.Location;
+
+public interface LocationRepository extends CrudRepository<Location, Integer> {
+
 
 }
