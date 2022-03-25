@@ -53,8 +53,7 @@ public class ProductServiceImp implements ProductService {
 
 		} else if (product.getSellstartdate().after(product.getSellenddate())) {
 			throw new IllegalArgumentException("La fecha de inicio de venta debe ser menor a la fecha de fin");
-		} else if (product.getWeight().compareTo(new BigDecimal("0")) == 0
-				|| (product.getWeight().compareTo(new BigDecimal("0")) == -1)) {
+		} else if ( product.getWeight()>0 & product.getSize()>0) {
 			throw new IllegalArgumentException("Peso mayor a 0");
 		} else {
 			productsubcategory.get().setProductcategory(productcategory.get());
@@ -93,9 +92,8 @@ public class ProductServiceImp implements ProductService {
 		} else if (product.getSellstartdate().after(product.getSellenddate())) {
 			throw new IllegalArgumentException("La fecha de inicio de venta debe ser menor a la fecha de fin");
 		
-		} else if (product.getWeight().compareTo(new BigDecimal("0")) == 0
-				|| (product.getWeight().compareTo(new BigDecimal("0")) == -1)) {
-			throw new IllegalArgumentException("Peso mayor a 0");
+		} else if (product.getWeight()>0 & product.getSize()>0) {
+			throw new IllegalArgumentException("Peso mayor a 0 , Tamaño mayor a 0");
 		
 		
 		} else {

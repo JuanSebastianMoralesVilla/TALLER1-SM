@@ -53,7 +53,7 @@ public void editLocation(Location location) {
 
 			if (location == null) {
 				throw new RuntimeException();
-			} else if (location.getName().length() >= 5) {
+			} else if (!(location.getName().length() >= 5)) {
 				throw new IllegalArgumentException("El nombre debe tener 5 o mas caracteres");
 			} else if (location.getAvailability().compareTo(new BigDecimal("1")) == -1
 					|| (location.getAvailability().compareTo(new BigDecimal("10")) == 1)) {
