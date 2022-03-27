@@ -23,9 +23,10 @@ public class ProductcostHistoricImp implements ProductcosthistoryService {
 
 		Optional<Product> product = productRepository.findById(productId);
 
-		if (product.isEmpty()) {
+		
+		if (!product.isEmpty()) {
 			throw new RuntimeException();
-		} else if (productcosthistory == null) {
+		} else if (productcosthistory == null || productcosthistory== null) {
 			throw new RuntimeException();
 		} else if (product.get().getSellstartdate().after(product.get().getSellenddate())) {
 			throw new IllegalArgumentException("La fecha de inicio de venta debe ser menor a la fecha de fin");
@@ -38,7 +39,9 @@ public class ProductcostHistoricImp implements ProductcosthistoryService {
 
 	}
 public void editPHC(Productcosthistory productcosthistory, Integer productId) {
-		Optional<Product> product = productRepository.findById(productId);
+		
+	  
+	Optional<Product> product = productRepository.findById(productId);
 
 		if (productcosthistory == null) {
 			throw new RuntimeException();
