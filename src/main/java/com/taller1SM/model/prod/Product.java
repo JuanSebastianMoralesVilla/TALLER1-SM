@@ -63,13 +63,13 @@ public class Product implements Serializable {
 
 	private Timestamp sellstartdate;
 
-	private Long size;
+	private long size;
 
 	private BigDecimal standardcost;
 
 	private String style;
 
-	private Long weight;
+	private long weight;
 
 	// bi-directional many-to-one association to Billofmaterial
 	@OneToMany(mappedBy = "product1")
@@ -312,7 +312,7 @@ public class Product implements Serializable {
 		return this.sellstartdate;
 	}
 
-	public Long getSize() {
+	public long getSize() {
 		return this.size;
 	}
 
@@ -336,7 +336,7 @@ public class Product implements Serializable {
 		return this.unitmeasure2;
 	}
 
-	public Long getWeight() {
+	public long getWeight() {
 		return this.weight;
 	}
 
@@ -522,7 +522,7 @@ public class Product implements Serializable {
 		this.sellstartdate = sellstartdate;
 	}
 
-	public void setSize(Long size) {
+	public void setSize(long size) {
 		this.size = size;
 	}
 
@@ -546,7 +546,7 @@ public class Product implements Serializable {
 		this.unitmeasure2 = unitmeasure2;
 	}
 
-	public void setWeight(Long weight) {
+	public void setWeight(long weight) {
 		this.weight = weight;
 	}
 

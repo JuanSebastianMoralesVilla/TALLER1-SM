@@ -27,6 +27,9 @@ public class LocationServiceImp implements LocationService{
 	public void saveLocation(Location location) {
 		if (location == null) {
 			throw new RuntimeException();
+		}else if(!locationRepository.findById(location.getLocationid()).isEmpty()) {
+			throw new IllegalArgumentException("el id de location ya existe ");
+		
 		} else if (location.getName().length() >= 5) {
 			throw new IllegalArgumentException("El nombre debe tener 5 o mas caracteres");
 		} else if (location.getAvailability().compareTo(new BigDecimal("1")) == -1
@@ -53,7 +56,7 @@ public void editLocation(Location location) {
 
 			if (location == null) {
 				throw new RuntimeException();
-			} else if (!(location.getName().length() >= 5)) {
+			} else if (location.getName().length() < 5) {
 				throw new IllegalArgumentException("El nombre debe tener 5 o mas caracteres");
 			} else if (location.getAvailability().compareTo(new BigDecimal("1")) == -1
 					|| (location.getAvailability().compareTo(new BigDecimal("10")) == 1)) {

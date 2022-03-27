@@ -1,5 +1,6 @@
 package com.example.demo;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
@@ -87,18 +88,33 @@ class ServiceUnitTesting {
 	}
 
 	// Escenarios
+	/*
+	 * public void setup1Product() { Product pr = new Product();
+	 * 
+	 * Productcategory productCategory = new Productcategory(); Productsubcategory
+	 * productSubCategory = new Productsubcategory(); pr.setProductid(1);
+	 * 
+	 * productCategory.setProductcategoryid(1);
+	 * productSubCategory.setProductsubcategoryid(1);
+	 * 
+	 * 
+	 * 
+	 * 
+	 * }
+	 **/
 
-	public void setup1Product() {
+	public Product setup1Pr() {
 		Product pr = new Product();
-
-		Productcategory productCategory = new Productcategory();
-		Productsubcategory productSubCategory = new Productsubcategory();
 		pr.setProductid(1);
-		productCategory.setProductcategoryid(1);
-		productSubCategory.setProductsubcategoryid(1);
-		when(productRepository.findById(1)).thenReturn(Optional.of(pr));
+		pr.setWeight((long) 3);
+		pr.setSize((long) 10);
+		pr.setProductnumber("0001");
+		pr.setSellenddate(new Timestamp(System.currentTimeMillis() + (60 * 60 * 24)));
+		pr.setSellstartdate(new Timestamp(System.currentTimeMillis()));
+		return pr;
 
 	}
+
 
 	@BeforeAll
 	public void setup1Location() {
@@ -131,9 +147,10 @@ class ServiceUnitTesting {
 
 	// SAVE PRODUCT
 
-// test que envia la excepcion si el producto es nulo
+	// test que envia la excepcion si el producto es nulo
 	@Test
-	public void testSave1Product() {
+	public void testSaveProductNull() {
+
 		Product pr = null;
 		assertThrows(RuntimeException.class, () -> {
 			productService.saveProduct(pr, null, null);
@@ -142,13 +159,20 @@ class ServiceUnitTesting {
 
 	// Agregar un producto valido
 	@Test
-	public void testSave2Product() {
+	public void testSaveProductFull() {
 		Product pr = new Product();
+		Productcategory cr = new Productcategory();
+		Productsubcategory prsub = new Productsubcategory();
 		pr.setName("iphone");
 		pr.setWeight((long) 1);
 		pr.setSize((long) 10);
-		// pr.setSellenddate();
-		// pr.setSellstartdate();
+		// 26/04/2022
+		// end > mayor
+
+		when(productcategoryRepository.findById(1)).thenReturn(Optional.of(cr));
+		when(productSubcategoryRepository.findById(1)).thenReturn(Optional.of(prsub));
+		pr.setSellenddate(new Timestamp(System.currentTimeMillis() + (60 * 60 * 24)));
+		pr.setSellstartdate(new Timestamp(System.currentTimeMillis()));
 		assertThrows(RuntimeException.class, () -> {
 			productService.saveProduct(pr, 1, 1);
 		});
@@ -157,39 +181,325 @@ class ServiceUnitTesting {
 	// Agregar un producto con tamaño -1
 
 	@Test
-	public void testSave3Product() {
+	public void testSaveProductSizeInvalid() {
 		Product pr = new Product();
+		Productcategory cr = new Productcategory();
+		Productsubcategory prsub = new Productsubcategory();
 		pr.setName("iphone");
 		pr.setWeight((long) 1);
 		pr.setSize((long) -1);
-		// pr.setSellenddate();
-		// pr.setSellstartdate();
+		pr.setSellenddate(new Timestamp(System.currentTimeMillis() + (60 * 60 * 24)));
+		pr.setSellstartdate(new Timestamp(System.currentTimeMillis()));
+
+		when(productcategoryRepository.findById(1)).thenReturn(Optional.of(cr));
+		when(productSubcategoryRepository.findById(1)).thenReturn(Optional.of(prsub));
 		assertThrows(RuntimeException.class, () -> {
 			productService.saveProduct(pr, 1, 1);
 		});
 	}
 
-	// Agregar un producto con peso > 0
+	// Agregar un producto con peso < 0
 
 	@Test
-	public void testSave4Product() {
+	public void testSaveProductWeigthInvalid() {
 		Product pr = new Product();
+		Productcategory cr = new Productcategory();
+		Productsubcategory prsub = new Productsubcategory();
 		pr.setName("iphone");
+		pr.setProductnumber("1111");
 		pr.setWeight((long) -1);
 		pr.setSize((long) 10);
-		// pr.setSellenddate();
-		// pr.setSellstartdate();
-		assertThrows(RuntimeException.class, () -> {
+		pr.setSellenddate(new Timestamp(System.currentTimeMillis() + (60 * 60 * 24)));
+		pr.setSellstartdate(new Timestamp(System.currentTimeMillis()));
+		when(productcategoryRepository.findById(1)).thenReturn(Optional.of(cr));
+		when(productSubcategoryRepository.findById(1)).thenReturn(Optional.of(prsub));
+		assertThrows(IllegalArgumentException.class, () -> {
 			productService.saveProduct(pr, 1, 1);
 		});
 	}
 
+	// validar fecha de inicio > a la de end
+
+	@Test
+	public void testSaveProductDate() {
+		Product pr = new Product();
+		Productcategory cr = new Productcategory();
+		Productsubcategory prsub = new Productsubcategory();
+
+		pr.setName("iphone");
+		pr.setWeight((long) 1);
+		pr.setSize((long) 10);
+		pr.setProductnumber("00001");
+		// 26/04/2022
+		// star > mayor asi no funciona
+
+		when(productcategoryRepository.findById(1)).thenReturn(Optional.of(cr));
+		when(productSubcategoryRepository.findById(1)).thenReturn(Optional.of(prsub));
+
+		pr.setSellenddate(new Timestamp(System.currentTimeMillis()));
+		pr.setSellstartdate(new Timestamp(System.currentTimeMillis() + (60 * 60 * 24)));
+		assertThrows(IllegalArgumentException.class, () -> {
+			productService.saveProduct(pr, 1, 1);
+		});
+	}
+
+	
+	// producto con nombre nulo
+	@Test
+	public void testSaveProductNameNull() {
+		Product pr = new Product();
+		Productcategory cr = new Productcategory();
+		Productsubcategory prsub = new Productsubcategory();
+
+		pr.setName("iphone");
+		pr.setWeight((long) 1);
+		pr.setSize((long) 10);
+		pr.setProductnumber("");
+		// 26/04/2022
+		// star > mayor asi no funciona
+
+		when(productcategoryRepository.findById(1)).thenReturn(Optional.of(cr));
+		when(productSubcategoryRepository.findById(1)).thenReturn(Optional.of(prsub));
+
+		pr.setSellenddate(new Timestamp(System.currentTimeMillis()));
+		pr.setSellstartdate(new Timestamp(System.currentTimeMillis() + (60 * 60 * 24)));
+		assertThrows(IllegalArgumentException.class, () -> {
+			productService.saveProduct(pr, 1, 1);
+		});
+	}
+
+	// prueba para producto con subcategoria inexistente
+
+	@Test
+	public void testSaveProductInexistentSubCategory() {
+		Product pr = setup1Pr();
+		Productsubcategory prsub = new Productsubcategory();
+		prsub.setProductsubcategoryid(1);
+		when(productSubcategoryRepository.findById(1)).thenReturn(Optional.of(prsub));
+
+		assertThrows(RuntimeException.class, () -> {
+			productService.saveProduct(pr, 1, null);
+		});
+	}
+
+	// prueba para producto con categoria inexistente
+	@Test
+	public void testSaveProductInexistentCategory() {
+		Product pr = setup1Pr();
+		Productcategory prct = new Productcategory();
+		prct.setProductcategoryid(1);
+		when(productcategoryRepository.findById(1)).thenReturn(Optional.of(prct));
+
+		assertThrows(RuntimeException.class, () -> {
+			productService.saveProduct(pr, null, 1);
+		});
+	}
+
+	// prueba para producto con id iguales
+	@Test
+	public void testSaveProductIdequals() {
+		Product pr = setup1Pr();
+		Productsubcategory prsub = new Productsubcategory();
+		Productcategory prc = new Productcategory();
+
+		when(productRepository.findById(1)).thenReturn(Optional.of(pr));
+		when(productcategoryRepository.findById(1)).thenReturn(Optional.of(prc));
+		when(productSubcategoryRepository.findById(1)).thenReturn(Optional.of(prsub));
+
+		assertThrows(IllegalArgumentException.class, () -> {
+			productService.saveProduct(pr, 1, 1);
+		});
+	}
+
+	// prueba con category inexistente 
+	
+	@Test
+	public void testSaveProductcategoryInexist() {
+		Product pr = setup1Pr();
+		Productsubcategory prsub = new Productsubcategory();
+		Productcategory prc = new Productcategory();
+
+		when(productRepository.findById(1)).thenReturn(Optional.of(pr));
+		when(productcategoryRepository.findById(1)).thenReturn(Optional.empty());
+		when(productSubcategoryRepository.findById(1)).thenReturn(Optional.of(prsub));
+
+		assertThrows(IllegalArgumentException.class, () -> {
+			productService.saveProduct(pr, 1, 1);
+		});
+	}
+	
+	
+	// prueba con subcategory Inexistent
+	
+	
+	@Test
+	public void testSaveProductsubategoryInexist() {
+		Product pr = setup1Pr();
+		Productsubcategory prsub = new Productsubcategory();
+		Productcategory prc = new Productcategory();
+
+		when(productRepository.findById(1)).thenReturn(Optional.of(pr));
+		when(productcategoryRepository.findById(1)).thenReturn(Optional.of(prc));
+		when(productSubcategoryRepository.findById(1)).thenReturn(Optional.empty());
+
+		assertThrows(IllegalArgumentException.class, () -> {
+			productService.saveProduct(pr, 1, 1);
+		});
+	}
+	
+	
+	// EDIT PRODUCT 
+	
+	@Test
+	public void productEditTestInvalidProductNumber() {
+	
+		Product pr = setup1Pr();
+		Productsubcategory prsub = new Productsubcategory();
+		Productcategory prc = new Productcategory();
+		pr.setProductnumber("");
+		Integer id = 1;
+		
+		
+		
+		when(productRepository.findById(1)).thenReturn(Optional.of(pr));
+		when(productcategoryRepository.findById(1)).thenReturn(Optional.of(prc));
+		when(productSubcategoryRepository.findById(1)).thenReturn(Optional.of(prsub));
+		
+		assertThrows(IllegalArgumentException.class, () -> {
+			productService.editProduct(pr, id, id);
+		});
+	}
+	
+	@Test
+	public void productEditTestInvalidDate() {
+	
+		Product pr = setup1Pr();
+		Productsubcategory prsub = new Productsubcategory();
+		Productcategory prc = new Productcategory();
+		pr.setSellenddate(new Timestamp(System.currentTimeMillis()));
+		pr.setSellstartdate(new Timestamp(System.currentTimeMillis() + (60*60*24)));
+		Integer id = 1;
+		
+		
+		
+		when(productRepository.findById(1)).thenReturn(Optional.of(pr));
+		when(productcategoryRepository.findById(1)).thenReturn(Optional.of(prc));
+		when(productSubcategoryRepository.findById(1)).thenReturn(Optional.of(prsub));
+		
+		assertThrows(IllegalArgumentException.class, () -> {
+			productService.editProduct(pr, id, id);
+		});
+	}
+	@Test
+	public void productEditTestInvalidsize() {
+	
+		Product pr = setup1Pr();
+		Productsubcategory prsub = new Productsubcategory();
+		Productcategory prc = new Productcategory();
+		pr.setSize(-10);
+		Integer id = 1;
+		
+		
+		
+		when(productRepository.findById(1)).thenReturn(Optional.of(pr));
+		when(productcategoryRepository.findById(1)).thenReturn(Optional.of(prc));
+		when(productSubcategoryRepository.findById(1)).thenReturn(Optional.of(prsub));
+		
+		assertThrows(IllegalArgumentException.class, () -> {
+			productService.editProduct(pr, id, id);
+		});
+	}
+	
+	@Test
+	public void productEditTestInvalidWeigth() {
+	
+		Product pr = setup1Pr();
+		Productsubcategory prsub = new Productsubcategory();
+		Productcategory prc = new Productcategory();
+		pr.setWeight(-10);
+		Integer id = 1;
+		
+		
+		
+		when(productRepository.findById(1)).thenReturn(Optional.of(pr));
+		when(productcategoryRepository.findById(1)).thenReturn(Optional.of(prc));
+		when(productSubcategoryRepository.findById(1)).thenReturn(Optional.of(prsub));
+		
+		assertThrows(IllegalArgumentException.class, () -> {
+			productService.editProduct(pr, id, id);
+		});
+	}
+	
+	@Test
+	public void testEditProductcategoryInexist() {
+		Product pr = setup1Pr();
+		Productsubcategory prsub = new Productsubcategory();
+		Productcategory prc = new Productcategory();
+		
+		Integer id = 1;
+		
+		when(productRepository.findById(1)).thenReturn(Optional.of(pr));
+		when(productcategoryRepository.findById(1)).thenReturn(Optional.empty());
+		when(productSubcategoryRepository.findById(1)).thenReturn(Optional.of(prsub));
+
+		assertThrows(RuntimeException.class, () -> {
+			productService.editProduct(pr, id, id);
+		});
+	}
+	
+	
+	@Test
+	public void testEditProductsubcategoryInexist() {
+		Product pr = setup1Pr();
+		Productsubcategory prsub = new Productsubcategory();
+		Productcategory prc = new Productcategory();
+		
+		Integer id = 1;
+		
+		when(productRepository.findById(1)).thenReturn(Optional.of(pr));
+		when(productcategoryRepository.findById(1)).thenReturn(Optional.empty());
+		when(productSubcategoryRepository.findById(1)).thenReturn(Optional.of(prsub));
+
+		assertThrows(RuntimeException.class, () -> {
+			productService.editProduct(pr, id, id);
+		});
+	}
+	
+	
+	@Test
+	public void testEditProductNull() {
+		Product pr = null;
+		assertThrows(RuntimeException.class, () -> {
+			productService.editProduct(pr, null, null);
+		});
+		
+	}
+	@Test
+	public void testEditProductFull() {
+		Product pr = setup1Pr();
+		Productcategory cr = new Productcategory();
+
+		Productsubcategory prsub = new Productsubcategory();
+	
+
+		when(productRepository.findById(1)).thenReturn(Optional.of(pr));
+		when(productcategoryRepository.findById(1)).thenReturn(Optional.of(cr));
+		when(productSubcategoryRepository.findById(1)).thenReturn(Optional.of(prsub));
+
+		
+		assertDoesNotThrow(() -> {
+			productService.editProduct(pr, 1, 1);
+		});
+		
+	}
+	
+	
 	// ---------Pruebas de location------------
 
 	// SAVE LOCATION
 
 	@Test
-	public void testSave1Location() {
+	public void testSaveLocationNull() {
 		Location l = null;
 
 		assertThrows(RuntimeException.class, () -> {
@@ -198,8 +508,10 @@ class ServiceUnitTesting {
 
 	}
 
+	// localizacion guardada bien
+
 	@Test
-	public void testSave2Location() {
+	public void testSaveLocationFull() {
 		Location loc = new Location();
 		loc.setLocationid(1);
 		loc.setName("00005");
@@ -213,29 +525,13 @@ class ServiceUnitTesting {
 	}
 
 	// validar cantidad de caracetres en el nombre
-	@Disabled
+
 	@Test
-	public void testSave3Location() {
+	public void testSaveLocationInvalidName() {
 
 		Location loc2 = new Location();
-		loc2.setLocationid(7);
+		loc2.setLocationid(1);
 		loc2.setName("1234");
-		loc2.setAvailability(new BigDecimal(10));
-		loc2.setCostrate(new BigDecimal(1));
-
-		assertThrows(IllegalArgumentException.class, () -> {
-			locationService.saveLocation(loc2);
-		});
-
-	}
-
-	// disponibilidad
-	@Test
-	public void testSave4Location() {
-
-		Location loc2 = new Location();
-		loc2.setLocationid(7);
-		loc2.setName("12345");
 		loc2.setAvailability(new BigDecimal(-1));
 		loc2.setCostrate(new BigDecimal(1));
 
@@ -245,12 +541,58 @@ class ServiceUnitTesting {
 
 	}
 
-	// tasa de costo
+	// disponibilidad menor a 1
 	@Test
-	public void testSave5Location() {
+	public void testSaveLocationInvalidAvailability() {
 
 		Location loc2 = new Location();
-		loc2.setLocationid(7);
+		loc2.setLocationid(1);
+		loc2.setName("12345");
+		loc2.setAvailability(new BigDecimal(-1));
+		loc2.setCostrate(new BigDecimal(1));
+
+		assertThrows(IllegalArgumentException.class, () -> {
+			locationService.saveLocation(loc2);
+		});
+
+	}
+	// disponibilidad myor a 10
+		@Test
+		public void testSaveLocationInvalidAvailabilityMajor1() {
+
+			Location loc2 = new Location();
+			loc2.setLocationid(1);
+			loc2.setName("12345");
+			loc2.setAvailability(new BigDecimal(11));
+			loc2.setCostrate(new BigDecimal(1));
+
+			assertThrows(IllegalArgumentException.class, () -> {
+				locationService.saveLocation(loc2);
+			});
+
+		}
+		// disponibilidad null
+	@Test
+	public void testSaveLocationNullAvailability() {
+
+		Location loc2 = new Location();
+		loc2.setLocationid(1);
+		loc2.setName("12345");
+		loc2.setAvailability(null);
+		loc2.setCostrate(new BigDecimal(1));
+
+		assertThrows(IllegalArgumentException.class, () -> {
+			locationService.saveLocation(loc2);
+		});
+
+	}
+
+	// tasa de costo mayor a 1
+	@Test
+	public void testSaveLocationInvalidCostRate() {
+
+		Location loc2 = new Location();
+		loc2.setLocationid(1);
 		loc2.setName("12345");
 		loc2.setAvailability(new BigDecimal(10));
 		loc2.setCostrate(new BigDecimal(3));
@@ -260,22 +602,67 @@ class ServiceUnitTesting {
 		});
 
 	}
-	
-	// 
+	// tasa de costo menor a 1
 		@Test
-		public void testSave6Location() {
+		public void testSaveLocationInvalidCostRateMinor() {
 
 			Location loc2 = new Location();
-			loc2.setLocationid(8);
-			loc2.setName("12345678");
-			loc2.setAvailability(new BigDecimal(4));
-			loc2.setCostrate(new BigDecimal(1));
-     
+			loc2.setLocationid(1);
+			loc2.setName("12345");
+			loc2.setAvailability(new BigDecimal(10));
+			loc2.setCostrate(new BigDecimal(-1));
+
 			assertThrows(IllegalArgumentException.class, () -> {
 				locationService.saveLocation(loc2);
 			});
 
 		}
+		// tasa de costo menor a 1
+		@Test
+		public void testSaveLocationInvalidCostRateNull() {
+
+			Location loc2 = new Location();
+			loc2.setLocationid(1);
+			loc2.setName("12345");
+			loc2.setAvailability(new BigDecimal(10));
+			loc2.setCostrate(null);
+
+			assertThrows(IllegalArgumentException.class, () -> {
+				locationService.saveLocation(loc2);
+			});
+
+		}
+
+// location id ocupado en objeto 
+		public Location LocationSetup1() {
+			Location loc = new Location();
+			loc.setLocationid(1);
+			loc.setName("12345");
+			loc.setAvailability(new BigDecimal(10));
+			loc.setCostrate(new BigDecimal(1));
+			return loc;
+		}
+		@Test
+		public void testSaveduplicateid() {
+			
+			Location loc = LocationSetup1();
+	
+			
+			//when(locationRepository.findById(1)).thenReturn(Optional.of(loc));
+			
+			
+			assertThrows(IllegalArgumentException.class, () -> {
+				locationService.saveLocation(loc);
+			});
+			
+			
+
+			
+
+		}
+		
+		
+		
 
 	// ---------Pruebas de historic cost------------
 
@@ -328,6 +715,8 @@ class ServiceUnitTesting {
 	}
 
 	// que el producto no exista
+	
+	
 
 	// ---------Pruebas de productInventory------------
 
