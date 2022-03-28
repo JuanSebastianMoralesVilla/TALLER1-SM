@@ -149,7 +149,7 @@ class ServiceUnitTesting {
 		pr.setName("iphone");
 		pr.setWeight((long) 1);
 		pr.setSize((long) 10);
-		// 26/04/2022
+		// 26/03/2022
 		// end > mayor
 
 		when(productcategoryRepository.findById(1)).thenReturn(Optional.of(cr));
