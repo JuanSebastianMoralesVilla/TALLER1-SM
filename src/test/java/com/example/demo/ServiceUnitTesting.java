@@ -896,7 +896,7 @@ class ServiceUnitTesting {
 
 	}
 
-	// EDIT PRODUCT COST HISTORIC
+	//--------- EDIT PRODUCT COST HISTORIC------
 
 	@Test
 	public void testEditProductCostHistoryNull() {
