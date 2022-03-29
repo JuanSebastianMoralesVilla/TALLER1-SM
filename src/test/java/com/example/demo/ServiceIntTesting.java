@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -95,9 +96,9 @@ public class ServiceIntTesting {
 
 	public void setupPR() {
 		productsubcategory = new Productsubcategory();
-		productsubcategory.setName("cel");
+		productsubcategory.setName("celasda");
 		productsubcategory.setProductsubcategoryid(1);
-
+		when(productSubcategoryRepository.findById(1)).thenReturn(Optional.of(productsubcategory));
 		productsubcategory = productSubcategoryRepository.save(productsubcategory);
 
 		productcategory = new Productcategory();
@@ -105,6 +106,9 @@ public class ServiceIntTesting {
 		productcategory.setProductcategoryid(1);
 
 		productcategory = productcategoryRepository.save(productcategory);
+		
+		when(productcategoryRepository.findById(1)).thenReturn(Optional.of(productcategory));
+	
 
 	}
 
@@ -112,9 +116,10 @@ public class ServiceIntTesting {
 	@Test
 	
 	public void testSaveIntegratedProduct() {
-		//setupPR();
+		
+		setupPR();
 
-		product = new Product();
+		
 
 		try {
 
@@ -148,7 +153,9 @@ public class ServiceIntTesting {
 	@Test
 	
 	public void testEditIntegratedProduct() {
-
+		
+		
+		product = new Product();
 		
 
 		try {
@@ -163,7 +170,7 @@ public class ServiceIntTesting {
 			product.setWeight(-2); 
 			product.setSize(2);
 
-			assertThrows(IllegalArgumentException.class,
+			assertThrows(NullPointerException.class,
 					() -> productService.editProduct(product,
 							product.getProductsubcategory().getProductcategory().getProductcategoryid(),
 							product.getProductsubcategory().getProductsubcategoryid()));
@@ -193,6 +200,7 @@ public class ServiceIntTesting {
 					product.getProductsubcategory().getProductcategory().getProductcategoryid(),
 					product.getProductsubcategory().getProductsubcategoryid());
 
+			
 			Optional<Product> theProductEntity = productRepository.findById(product.getProductid());
 			Product theProduct = theProductEntity.get();
 
